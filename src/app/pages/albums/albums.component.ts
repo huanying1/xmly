@@ -4,6 +4,7 @@ import {MetaValue, SubCategory} from "../../services/apis/types";
 import {ActivatedRoute, Router} from "@angular/router";
 import {CategoryService} from "../../services/business/category.service";
 import {combineLatest} from "rxjs";
+import {withLatestFrom} from "rxjs/operators";
 
 
 @Component({
@@ -33,27 +34,25 @@ export class AlbumsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    combineLatest(
-        this.route.paramMap,
-        this.categoryServe.getCategory()
-    ).subscribe(([paramsMap,category]) => {
-      const pinyin = paramsMap.get('pinyin')
-      if (category === pinyin) {
-        this.searchParams.category = pinyin
-        this.searchParams.subcategory = ''
-        this.updatePageData()
-      } else {
-        //分类和参数不一样的情况，比如后退按钮
-        this.categoryServe.setCategory(pinyin)
-        this.router.navigateByUrl('/albums/' + pinyin)
-      }
-    })
-    // this.updatePageData()
+    //监听路由和分类，使路由和分类一至
+    this.route.paramMap.pipe(withLatestFrom(this.categoryServe.getCategory()))
+        .subscribe(([paramsMap, category]) => {
+          const pinyin = paramsMap.get('pinyin')
+          if (category !== pinyin) {
+            this.categoryServe.setCategory(pinyin)
+          }
+          this.searchParams.category = pinyin
+          this.searchParams.subcategory = ''
+          this.categoryServe.setSubCategory([])
+          this.updatePageData()
+        })
   }
 
   changeSubCategory(subCategory?: SubCategory): void {
     if (this.searchParams.subcategory !== subCategory?.code) {
       this.searchParams.subcategory = subCategory?.code || ''
+      //点击回全部时清空子分类
+      subCategory?.displayValue ? this.categoryServe.setSubCategory([subCategory.displayValue]) : this.categoryServe.setSubCategory([])
       this.updatePageData()
     }
   }

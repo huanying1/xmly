@@ -10,6 +10,7 @@ import { AlbumsComponent } from './albums.component';
   imports: [
     CommonModule,
     AlbumsRoutingModule
-  ]
+  ],
+  exports:[]
 })
 export class AlbumsModule { }

@@ -65,13 +65,25 @@ export class AlbumsComponent implements OnInit {
 
   changeMeta(row, meta): void {
     console.log('row', row)
-    console.log('item', meta)
+    console.log('meta', meta)
     this.checkedMetas.push({
       metaRowId:row.id,
       metaRowName:row.name,
       metaId:meta.id,
       metaName:meta.displayName
     })
+    this.searchParams.meta = this.getMetaParams()
+  }
+
+  getMetaParams():string {
+    let result = ''
+    if (this.checkedMetas.length) {
+      this.checkedMetas.forEach(item => {
+        result += `${item.metaRowId}_${item.metaId}-`
+      })
+    }
+    console.log(result.slice(0,-1))
+    return result.slice(0,-1)
   }
 
   showMetaRow(name:string):boolean {
@@ -83,12 +95,14 @@ export class AlbumsComponent implements OnInit {
   unCheckMeta(meta:CheckedMeta | 'clean'):void  {
     if (meta === 'clean') {
       this.checkedMetas = []
+      this.searchParams.meta = ''
     } else {
       const targetIndex = this.checkedMetas.findIndex(item => {
         return (item.metaRowId === meta.metaRowId) && (item.metaId === meta.metaId)
       })
       if (targetIndex > -1) {
         this.checkedMetas.splice(targetIndex,1)
+        this.searchParams.meta = this.getMetaParams()
       }
     }
   }

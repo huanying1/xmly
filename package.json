@@ -20,7 +20,6 @@
     "@angular/platform-browser-dynamic": "~11.1.2",
     "@angular/router": "~11.1.2",
     "normalize.css": "^8.0.1",
-    "qs": "^6.9.6",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
     "zone.js": "~0.11.3"

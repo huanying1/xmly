@@ -4,7 +4,7 @@ import {Observable} from "rxjs";
 import {map} from "rxjs/operators";
 import {environment} from "../../../environments/environment";
 import {Album, AlbumInfo, Anchor, Base, Category, MetaData, SubCategory, TracksInfo} from "./types";
-import {stringify} from "qs";
+import {stringify} from "querystring";
 
 
 
@@ -69,6 +69,12 @@ export class AlbumService {
         .get(`${environment.baseUrl}${this.prefix}categories`, { params:args })
         .pipe(map((res: Base<CategoryInfo>) => res.data));
   }
-
+  //获取专辑列表
+  albums(args:AlbumArgs):Observable<AlbumsInfo> {
+    const params = new HttpParams({fromString:stringify(args)})
+    return this.http
+      .get(`${environment.baseUrl}${this.prefix}albums`,{params})
+      .pipe(map((res:Base<AlbumsInfo>) => res.data))
+  }
 }
 

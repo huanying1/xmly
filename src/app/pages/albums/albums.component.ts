@@ -5,6 +5,8 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {CategoryService} from "../../services/business/category.service";
 import {withLatestFrom} from "rxjs/operators";
 import {forkJoin} from "rxjs";
+import {WindowService} from "../../services/tools/window.service";
+import {storageKeys} from "../../config";
 
 interface CheckedMeta {
   metaRowId: number
@@ -38,6 +40,7 @@ export class AlbumsComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
     private categoryServe: CategoryService,
+    private windowServe: WindowService
   ) {
   }
 
@@ -46,25 +49,40 @@ export class AlbumsComponent implements OnInit {
     this.route.paramMap.pipe(withLatestFrom(this.categoryServe.getCategory()))
       .subscribe(([paramsMap, category]) => {
         const pinyin = paramsMap.get('pinyin')
+        this.searchParams.category = pinyin
+        let needSetStatus: boolean = false
         if (category !== pinyin) {
           this.categoryServe.setCategory(pinyin)
+          this.clearSubCategory()
+          this.unCheckMeta('clear')
+        } else {
+          const cacheSubCategory = this.windowServe.getStorage(storageKeys.subcategoryCode)
+          const cacheMetas = this.windowServe.getStorage(storageKeys.metas)
+          if (cacheSubCategory) {
+            needSetStatus = true
+            this.searchParams.subcategory = cacheSubCategory
+          }
+          if (cacheMetas) {
+            needSetStatus = true
+            this.searchParams.meta = cacheMetas
+          }
         }
-        this.searchParams.category = pinyin
-        this.searchParams.subcategory = ''
-        this.categoryServe.setSubCategory([])
-        this.unCheckMeta('clear')
-        this.updatePageData()
+        this.updatePageData(needSetStatus)
       })
   }
 
   changeSubCategory(subCategory?: SubCategory): void {
-    if (this.searchParams.subcategory !== subCategory?.code) {
-      this.searchParams.subcategory = subCategory?.code || ''
-      //点击回全部时清空子分类
-      subCategory?.displayValue ? this.categoryServe.setSubCategory([subCategory.displayValue]) : this.categoryServe.setSubCategory([])
-      this.unCheckMeta('clear')
-      this.updatePageData()
+    //点击回全部时清空子分类
+    if (subCategory) {
+      this.searchParams.subcategory = subCategory.code
+      this.categoryServe.setSubCategory([subCategory.displayValue])
+      this.windowServe.setStorage(storageKeys.subcategoryCode, this.searchParams.subcategory)
+    } else {
+      this.clearSubCategory()
     }
+    this.unCheckMeta('clear')
+    this.updatePageData()
+
   }
 
   changeMeta(row, meta): void {
@@ -75,6 +93,7 @@ export class AlbumsComponent implements OnInit {
       metaName: meta.displayName
     })
     this.searchParams.meta = this.getMetaParams()
+    this.windowServe.setStorage(storageKeys.metas, this.searchParams.meta)
     this.updateAlbums()
   }
 
@@ -100,6 +119,7 @@ export class AlbumsComponent implements OnInit {
     if (meta === 'clear') {
       this.checkedMetas = []
       this.searchParams.meta = ''
+      this.windowServe.removeStorage(storageKeys.metas)
     } else {
       const targetIndex = this.checkedMetas.findIndex(item => {
         return (item.metaRowId === meta.metaRowId) && (item.metaId === meta.metaId)
@@ -107,19 +127,22 @@ export class AlbumsComponent implements OnInit {
       if (targetIndex > -1) {
         this.checkedMetas.splice(targetIndex, 1)
         this.searchParams.meta = this.getMetaParams()
+        this.windowServe.setStorage(storageKeys.metas, this.searchParams.meta)
       }
     }
     this.updateAlbums()
   }
 
-  private updatePageData(): void {
+  private updatePageData(needSetStatus: boolean = false): void {
     forkJoin([
       this.albumsServe.albums(this.searchParams),
       this.albumsServe.detailCategoryPageInfo(this.searchParams)
     ]).subscribe(([albumsInfo, categoryInfo]) => {
       this.albumsInfo = albumsInfo
       this.categoryInfo = categoryInfo
-      console.log(albumsInfo)
+      if (needSetStatus) {
+        this.setStatus(categoryInfo)
+      }
       this.cdr.markForCheck()
     })
   }
@@ -135,6 +158,40 @@ export class AlbumsComponent implements OnInit {
     if (this.searchParams.sort !== index) {
       this.searchParams.sort = index
       this.updateAlbums()
+    }
+  }
+
+  private clearSubCategory(): void {
+    this.searchParams.subcategory = ''
+    this.categoryServe.setSubCategory([])
+    this.windowServe.removeStorage(storageKeys.subcategoryCode)
+  }
+
+  private setStatus({metadata, subcategories}): void {
+    console.log(metadata)
+    const subCategory = subcategories.findIndex(item => item.code === this.searchParams.subcategory)
+    console.log(subCategory)
+    if (subCategory) {
+      this.categoryServe.setSubCategory([subCategory.displayValue])
+    }
+    if (this.searchParams.meta) {
+      const metasMap = this.searchParams.meta.split('-').map(item => item.split('_'))
+      console.log(metasMap)
+      metasMap.forEach(meta => {
+        const targetRow = metadata.find(row => row.id === Number(meta[0]))
+        console.log(targetRow)
+        //从详情导航过来的标签不一定存在
+        const {id: metaRowId, name, metaValues} = targetRow || metadata[0]
+        console.log(metadata[0])
+        const targetMeta = metaValues.find(item => item.id === Number(meta[1]))
+        const {id,displayName} = targetMeta || metaValues[0]
+        this.checkedMetas.push({
+          metaRowId,
+          metaRowName:name,
+          metaId:id,
+          metaName:displayName
+        })
+      })
     }
   }
 

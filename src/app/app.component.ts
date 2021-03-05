@@ -48,8 +48,6 @@ export class AppComponent implements OnInit{
 
   changeCategory(category) {
     if (this.currentCategory.id !== category.id) {
-      // this.currentCategory = category
-      this.categoryServe.setCategory(category.pinyin)
       this.router.navigateByUrl('/albums/' + category.pinyin)
     }
   }

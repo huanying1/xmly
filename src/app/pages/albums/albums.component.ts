@@ -1,7 +1,7 @@
 import {Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
 import {AlbumArgs, AlbumService, AlbumsInfo, CategoryInfo} from "../../services/apis/album.service";
 import {Album, MetaValue, SubCategory} from "../../services/apis/types";
-import {ActivatedRoute, Router} from "@angular/router";
+import {ActivatedRoute} from "@angular/router";
 import {CategoryService} from "../../services/business/category.service";
 import {withLatestFrom} from "rxjs/operators";
 import {forkJoin} from "rxjs";
@@ -168,21 +168,16 @@ export class AlbumsComponent implements OnInit {
   }
 
   private setStatus({metadata, subcategories}): void {
-    console.log(metadata)
     const subCategory = subcategories.findIndex(item => item.code === this.searchParams.subcategory)
-    console.log(subCategory)
     if (subCategory) {
       this.categoryServe.setSubCategory([subCategory.displayValue])
     }
     if (this.searchParams.meta) {
       const metasMap = this.searchParams.meta.split('-').map(item => item.split('_'))
-      console.log(metasMap)
       metasMap.forEach(meta => {
         const targetRow = metadata.find(row => row.id === Number(meta[0]))
-        console.log(targetRow)
         //从详情导航过来的标签不一定存在
         const {id: metaRowId, name, metaValues} = targetRow || metadata[0]
-        console.log(metadata[0])
         const targetMeta = metaValues.find(item => item.id === Number(meta[1]))
         const {id,displayName} = targetMeta || metaValues[0]
         this.checkedMetas.push({

@@ -71,6 +71,7 @@ export class AlbumService {
   }
   //获取专辑列表
   albums(args:AlbumArgs):Observable<AlbumsInfo> {
+    console.log(args)
     const params = new HttpParams({fromString:stringify(args)})
     return this.http
       .get(`${environment.baseUrl}${this.prefix}albums`,{params})

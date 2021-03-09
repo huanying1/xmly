@@ -34,7 +34,7 @@ export class AlbumsComponent implements OnInit {
   checkedMetas: CheckedMeta[] = []
   albumsInfo: AlbumsInfo
   sorts: string[] = ['综合排序', '最近更新', '播放最多']
-
+  tagColor = 'green'
   constructor(
     private albumsServe: AlbumService,
     private cdr: ChangeDetectorRef,

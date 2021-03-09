@@ -5,6 +5,7 @@ import { AlbumsRoutingModule } from './albums-routing.module';
 import { AlbumsComponent } from './albums.component';
 import {DirectivesModule} from "../../share/directives/directives.module";
 import {PiPesModule} from "../../share/pipes/pipes.module";
+import {TagModule} from "../../share/components/tag/tag.module";
 
 
 @NgModule({
@@ -13,7 +14,8 @@ import {PiPesModule} from "../../share/pipes/pipes.module";
     CommonModule,
     AlbumsRoutingModule,
     DirectivesModule,
-    PiPesModule
+    PiPesModule,
+    TagModule
   ],
   exports:[]
 })

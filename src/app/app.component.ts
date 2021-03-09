@@ -28,6 +28,7 @@ export class AppComponent implements OnInit{
 
   ngOnInit():void {
     this.init()
+
   }
 
   private init():void {

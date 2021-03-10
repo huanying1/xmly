@@ -30,11 +30,11 @@ export class AlbumsComponent implements OnInit {
     page: 1,
     perPage: 30
   };
+  total = 300
   categoryInfo: CategoryInfo
   checkedMetas: CheckedMeta[] = []
   albumsInfo: AlbumsInfo
   sorts: string[] = ['综合排序', '最近更新', '播放最多']
-  tagColor = 'green'
   constructor(
     private albumsServe: AlbumService,
     private cdr: ChangeDetectorRef,
@@ -50,6 +50,8 @@ export class AlbumsComponent implements OnInit {
       .subscribe(([paramsMap, category]) => {
         const pinyin = paramsMap.get('pinyin')
         this.searchParams.category = pinyin
+        console.log(this.searchParams.page)
+        this.searchParams.page !== 1 ? this.searchParams.page = 1 : ''
         let needSetStatus: boolean = false
         if (category !== pinyin) {
           this.categoryServe.setCategory(pinyin)
@@ -80,9 +82,9 @@ export class AlbumsComponent implements OnInit {
     } else {
       this.clearSubCategory()
     }
+    this.searchParams.page = 1
     this.unCheckMeta('clear')
     this.updatePageData()
-
   }
 
   changeMeta(row, meta): void {
@@ -93,6 +95,7 @@ export class AlbumsComponent implements OnInit {
       metaName: meta.displayName
     })
     this.searchParams.meta = this.getMetaParams()
+    this.searchParams.page = 1
     this.windowServe.setStorage(storageKeys.metas, this.searchParams.meta)
     this.updateAlbums()
   }
@@ -104,7 +107,6 @@ export class AlbumsComponent implements OnInit {
         result += `${item.metaRowId}_${item.metaId}-`
       })
     }
-    console.log(result.slice(0, -1))
     return result.slice(0, -1)
   }
 
@@ -150,6 +152,8 @@ export class AlbumsComponent implements OnInit {
   private updateAlbums(): void {
     this.albumsServe.albums(this.searchParams).subscribe(albumsInfo => {
       this.albumsInfo = albumsInfo
+      this.total = albumsInfo.total
+      console.log(albumsInfo)
       this.cdr.markForCheck()
     })
   }
@@ -187,6 +191,13 @@ export class AlbumsComponent implements OnInit {
           metaName:displayName
         })
       })
+    }
+  }
+
+  changePage(newPageNum:number):void {
+    if (this.searchParams.page !== newPageNum) {
+      this.searchParams.page = newPageNum
+      this.updateAlbums()
     }
   }
 

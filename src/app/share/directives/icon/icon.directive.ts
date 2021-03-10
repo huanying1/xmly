@@ -2,10 +2,7 @@ import {Directive, ElementRef, HostBinding, Input, OnChanges, Renderer2, SimpleC
 import {IconType} from "./types";
 
 @Directive({
-  selector: '[xmIcon]',
-  // host: {
-  //   '[class.iconfont]': 'true'
-  // }
+  selector: 'i[xmIcon]',
 })
 export class IconDirective implements OnChanges {
   @HostBinding('class.iconfont') readonly hostClass = true

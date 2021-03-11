@@ -12,23 +12,23 @@ import {CategoryService} from "../../services/business/category.service";
   changeDetection:ChangeDetectionStrategy.OnPush
 })
 export class AlbumComponent implements OnInit {
-  albumInfo: AlbumInfo;
-  score: number;
-  anchor: Anchor;
-  relateAlbums: RelateAlbum[];
-  tracks: Track[] = [];
-  total = 0;
+  albumInfo: AlbumInfo
+  score: number
+  anchor: Anchor
+  relateAlbums: RelateAlbum[]
+  tracks: Track[] = []
+  total = 0
   trackParams: AlbumTrackArgs = {
     albumId: '',
     sort: 1,
     pageNum: 1,
     pageSize: 30
-  };
+  }
   constructor(
     private route:ActivatedRoute,
     private albumServe:AlbumService,
     private categoryServe: CategoryService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
     ) { }
 
   ngOnInit(): void {
@@ -45,7 +45,6 @@ export class AlbumComponent implements OnInit {
       this.total = albumInfo.tracksInfo.trackTotalCount
       this.relateAlbums = relateAlbum.slice(0,10)
       this.categoryServe.setSubCategory([this.albumInfo.albumTitle])
-      console.log(this.albumInfo)
       this.cdr.markForCheck()
     })
 

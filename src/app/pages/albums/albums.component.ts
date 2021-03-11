@@ -50,7 +50,6 @@ export class AlbumsComponent implements OnInit {
       .subscribe(([paramsMap, category]) => {
         const pinyin = paramsMap.get('pinyin')
         this.searchParams.category = pinyin
-        console.log(this.searchParams.page)
         this.searchParams.page !== 1 ? this.searchParams.page = 1 : ''
         let needSetStatus: boolean = false
         if (category !== pinyin) {

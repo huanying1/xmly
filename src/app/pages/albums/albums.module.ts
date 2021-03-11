@@ -17,7 +17,7 @@ import {PaginationModule} from "../../share/components/pagination/pagination.mod
     DirectivesModule,
     PiPesModule,
     TagModule,
-    PaginationModule
+    PaginationModule,
   ],
   exports:[]
 })

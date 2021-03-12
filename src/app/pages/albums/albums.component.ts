@@ -154,7 +154,6 @@ export class AlbumsComponent implements OnInit {
     this.albumsServe.albums(this.searchParams).subscribe(albumsInfo => {
       this.albumsInfo = albumsInfo
       this.total = albumsInfo.total
-      console.log(albumsInfo)
       this.cdr.markForCheck()
     })
   }

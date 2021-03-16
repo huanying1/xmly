@@ -30,7 +30,6 @@ export class PaginationComponent implements OnInit,OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     this.lastNum = Math.ceil(this.total / this.pageSize) || 1
     this.listOfPageItems = this.getListOfPageBtns(this.pageNum,this.lastNum)
-    console.log(this.listOfPageItems)
   }
   pageClick({disabled,type,num}:PageItem):void {
     if (!disabled) {

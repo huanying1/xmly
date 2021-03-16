@@ -6,7 +6,6 @@ import {AlbumInfo, Anchor, RelateAlbum, Track} from "../../services/apis/types";
 import {CategoryService} from "../../services/business/category.service";
 import {IconType} from "../../share/directives/icon/types";
 
-
 interface MoreState {
   full:boolean,
   label:string,
@@ -20,6 +19,7 @@ interface MoreState {
   changeDetection:ChangeDetectionStrategy.OnPush
 })
 export class AlbumComponent implements OnInit {
+  checked:boolean
   albumInfo: AlbumInfo
   score: number
   anchor: Anchor
@@ -52,6 +52,7 @@ export class AlbumComponent implements OnInit {
     })
 
   }
+
   toggleMore() {
     this.moreState.full = !this.moreState.full
     if (this.moreState.full) {
@@ -76,6 +77,12 @@ export class AlbumComponent implements OnInit {
       this.tracks = albumInfo.tracksInfo.tracks
       this.total = albumInfo.tracksInfo.trackTotalCount
       this.relateAlbums = relateAlbum.slice(0,10)
+      this.categoryServe.getCategory().subscribe(category => {
+        const {categoryPinyin} = this.albumInfo.crumbs
+        if (category !== categoryPinyin) {
+          this.categoryServe.setCategory(categoryPinyin)
+        }
+      })
       this.categoryServe.setSubCategory([this.albumInfo.albumTitle])
       this.cdr.markForCheck()
     })

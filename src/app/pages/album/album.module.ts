@@ -6,6 +6,8 @@ import { AlbumComponent } from './album.component';
 import {TagModule} from "../../share/components/tag/tag.module";
 import {DirectivesModule} from "../../share/directives/directives.module";
 import {PiPesModule} from "../../share/pipes/pipes.module";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {CheckboxModule} from "../../share/components/checkbox/checkbox.module";
 
 
 @NgModule({
@@ -15,7 +17,10 @@ import {PiPesModule} from "../../share/pipes/pipes.module";
     AlbumRoutingModule,
     TagModule,
     DirectivesModule,
-    PiPesModule
+    PiPesModule,
+    ReactiveFormsModule,
+    FormsModule,
+    CheckboxModule
   ]
 })
 export class AlbumModule { }

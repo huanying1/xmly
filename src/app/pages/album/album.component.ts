@@ -7,19 +7,19 @@ import {CategoryService} from "../../services/business/category.service";
 import {IconType} from "../../share/directives/icon/types";
 
 interface MoreState {
-  full:boolean,
-  label:string,
-  icon:IconType
+  full: boolean,
+  label: string,
+  icon: IconType
 }
 
 @Component({
   selector: 'xm-album',
   templateUrl: './album.component.html',
   styleUrls: ['./album.component.scss'],
-  changeDetection:ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AlbumComponent implements OnInit {
-  checked:boolean
+  checked: boolean
   albumInfo: AlbumInfo
   score: number
   anchor: Anchor
@@ -32,25 +32,42 @@ export class AlbumComponent implements OnInit {
     pageNum: 1,
     pageSize: 30
   }
-  moreState:MoreState = {
-    full:false,
-    label:'显示全部',
-    icon:'arrow-down-line'
+  moreState: MoreState = {
+    full: false,
+    label: '显示全部',
+    icon: 'arrow-down-line'
   }
-  articleHeight:number
+  articleHeight: number
+
   constructor(
-    private route:ActivatedRoute,
-    private albumServe:AlbumService,
+    private route: ActivatedRoute,
+    private albumServe: AlbumService,
     private categoryServe: CategoryService,
     private cdr: ChangeDetectorRef,
-    ) { }
+  ) {
+  }
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(paramMap => {
+    this.route.paramMap.subscribe(() => {
       this.trackParams.albumId = this.route.snapshot.paramMap.get('albumId')
       this.initPageData()
     })
 
+  }
+
+  changePage(page: number): void {
+    if (this.trackParams.pageNum !== page) {
+      this.trackParams.pageNum = page
+      this.updateTracks()
+    }
+  }
+
+  updateTracks(): void {
+    this.albumServe.tracks(this.trackParams).subscribe(({tracks,trackTotalCount}) => {
+      this.tracks = tracks
+      this.total = trackTotalCount
+      this.cdr.markForCheck()
+    })
   }
 
   toggleMore() {
@@ -58,33 +75,39 @@ export class AlbumComponent implements OnInit {
     if (this.moreState.full) {
       this.moreState.label = '收起'
       this.moreState.icon = 'arrow-up-line'
-    }else {
+    } else {
       this.moreState.label = '展开全部'
       this.moreState.icon = 'arrow-down-line'
     }
 
   }
 
-  private initPageData():void {
+  private initPageData(): void {
     forkJoin([
       this.albumServe.album(this.trackParams.albumId),
       this.albumServe.albumScore(this.trackParams.albumId),
       this.albumServe.relateAlbums(this.trackParams.albumId)
-    ]).subscribe(([albumInfo,score,relateAlbum]) => {
-      this.albumInfo = {...albumInfo.mainInfo,albumId:albumInfo.albumId}
+    ]).subscribe(([albumInfo, score, relateAlbum]) => {
+      this.albumInfo = {...albumInfo.mainInfo, albumId: albumInfo.albumId}
       this.score = score
       this.anchor = albumInfo.anchorInfo
       this.tracks = albumInfo.tracksInfo.tracks
       this.total = albumInfo.tracksInfo.trackTotalCount
-      this.relateAlbums = relateAlbum.slice(0,10)
+      this.relateAlbums = relateAlbum.slice(0, 10)
       this.categoryServe.getCategory().subscribe(category => {
         const {categoryPinyin} = this.albumInfo.crumbs
         if (category !== categoryPinyin) {
           this.categoryServe.setCategory(categoryPinyin)
         }
       })
+      console.log(this.tracks);
+      console.log(this.total);
       this.categoryServe.setSubCategory([this.albumInfo.albumTitle])
       this.cdr.markForCheck()
     })
+  }
+
+  trackByTracks(index: number, item: Track): number {
+    return item.trackId
   }
 }

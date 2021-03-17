@@ -8,6 +8,7 @@ import {DirectivesModule} from "../../share/directives/directives.module";
 import {PiPesModule} from "../../share/pipes/pipes.module";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {CheckboxModule} from "../../share/components/checkbox/checkbox.module";
+import {PaginationModule} from "../../share/components/pagination/pagination.module";
 
 
 @NgModule({
@@ -20,7 +21,8 @@ import {CheckboxModule} from "../../share/components/checkbox/checkbox.module";
     PiPesModule,
     ReactiveFormsModule,
     FormsModule,
-    CheckboxModule
+    CheckboxModule,
+    PaginationModule
   ]
 })
 export class AlbumModule { }

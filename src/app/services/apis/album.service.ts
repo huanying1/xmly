@@ -64,7 +64,6 @@ export class AlbumService {
 
   //二三级分类
   detailCategoryPageInfo(args: Pick<AlbumArgs, 'category' | 'subcategory'>): Observable<CategoryInfo> {
-    // const params = new HttpParams({ fromString: stringify(args) });
     return this.http
         .get(`${environment.baseUrl}${this.prefix}categories`, { params:args })
         .pipe(map((res: Base<CategoryInfo>) => res.data));
@@ -92,6 +91,12 @@ export class AlbumService {
     const params = new HttpParams().set('id', albumId);
     return this.http.get(`${environment.baseUrl}${this.prefix}album-relate`, { params })
       .pipe(map((res: Base<{ hotWordAlbums: RelateAlbum[] }>) => res.data.hotWordAlbums));
+  }
+
+  tracks(args: AlbumTrackArgs): Observable<TracksInfo> {
+    const params = new HttpParams({ fromString: stringify(args) });
+    return this.http.get(`${environment.baseUrl}${this.prefix}album-tracks`, { params })
+      .pipe(map((res: Base<TracksInfo>) => res.data));
   }
 }
 

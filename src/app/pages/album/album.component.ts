@@ -20,7 +20,7 @@ interface MoreState {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AlbumComponent implements OnInit {
-  checked: boolean
+  selectedTracks: Track[] = []
   albumInfo: AlbumInfo
   score: number
   anchor: Anchor
@@ -29,7 +29,7 @@ export class AlbumComponent implements OnInit {
   total = 0
   trackParams: AlbumTrackArgs = {
     albumId: '',
-    sort: 1,
+    sort: 0,
     pageNum: 1,
     pageSize: 30
   }
@@ -56,17 +56,59 @@ export class AlbumComponent implements OnInit {
 
   }
 
+  checkedChange(checked: boolean, track: Track): void {
+    const targetIndex = this.selectedIndex(track.trackId)
+    if (checked && targetIndex === -1) {
+      this.selectedTracks.push(track)
+    } else {
+      if (targetIndex > -1) {
+        this.selectedTracks.splice(targetIndex, 1)
+      }
+    }
+  }
+
+  isChecked(id: number): boolean {
+    return this.selectedIndex(id) > -1
+  }
+  isCheckedAll():boolean {
+    if (this.selectedTracks.length >= this.tracks.length && this.selectedTracks.length !== 0) {
+      return this.tracks.every(item => {
+        return this.selectedIndex(item.trackId) > -1
+      })
+    }
+    return false
+  }
+  private selectedIndex(id: number): number {
+    return this.selectedTracks.findIndex(item => item.trackId === id)
+  }
+  checkAllChange(checked):void {
+    console.log(checked)
+    this.tracks.forEach(item=>{
+      const targetIndex = this.selectedIndex(item.trackId)
+      if (checked && targetIndex === -1) {
+          console.log('checked true')
+          this.selectedTracks.push(item)
+      } else {
+        if (targetIndex > -1) {
+          console.log('checked false')
+          this.selectedTracks.splice(targetIndex,1)
+        }
+      }
+    })
+  }
   changePage(page: number): void {
+    console.log(this.trackParams.pageNum)
     if (this.trackParams.pageNum !== page) {
       this.trackParams.pageNum = page
+      console.log(this.trackParams.pageNum)
       this.updateTracks()
     }
   }
 
   updateTracks(): void {
-    this.albumServe.tracks(this.trackParams).subscribe(({tracks,trackTotalCount}) => {
-      this.tracks = tracks
-      this.total = trackTotalCount
+    this.albumServe.tracks(this.trackParams).subscribe((res) => {
+      this.tracks = res.tracks
+      this.total = res.trackTotalCount
       this.cdr.markForCheck()
     })
   }
@@ -92,8 +134,9 @@ export class AlbumComponent implements OnInit {
       this.albumInfo = {...albumInfo.mainInfo, albumId: albumInfo.albumId}
       this.score = score
       this.anchor = albumInfo.anchorInfo
-      this.tracks = albumInfo.tracksInfo.tracks
-      this.total = albumInfo.tracksInfo.trackTotalCount
+      // this.tracks = albumInfo.tracksInfo.tracks
+      // this.total = albumInfo.tracksInfo.trackTotalCount
+      this.updateTracks()
       this.relateAlbums = relateAlbum.slice(0, 10)
       this.categoryServe.getCategory().pipe(first()).subscribe(category => {
         const {categoryPinyin} = this.albumInfo.crumbs

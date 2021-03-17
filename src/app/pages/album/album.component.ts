@@ -5,6 +5,7 @@ import {forkJoin} from "rxjs";
 import {AlbumInfo, Anchor, RelateAlbum, Track} from "../../services/apis/types";
 import {CategoryService} from "../../services/business/category.service";
 import {IconType} from "../../share/directives/icon/types";
+import {first} from "rxjs/operators";
 
 interface MoreState {
   full: boolean,
@@ -94,7 +95,7 @@ export class AlbumComponent implements OnInit {
       this.tracks = albumInfo.tracksInfo.tracks
       this.total = albumInfo.tracksInfo.trackTotalCount
       this.relateAlbums = relateAlbum.slice(0, 10)
-      this.categoryServe.getCategory().subscribe(category => {
+      this.categoryServe.getCategory().pipe(first()).subscribe(category => {
         const {categoryPinyin} = this.albumInfo.crumbs
         if (category !== categoryPinyin) {
           this.categoryServe.setCategory(categoryPinyin)

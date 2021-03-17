@@ -100,8 +100,6 @@ export class AlbumComponent implements OnInit {
           this.categoryServe.setCategory(categoryPinyin)
         }
       })
-      console.log(this.tracks);
-      console.log(this.total);
       this.categoryServe.setSubCategory([this.albumInfo.albumTitle])
       this.cdr.markForCheck()
     })

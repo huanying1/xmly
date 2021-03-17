@@ -1,5 +1,5 @@
 import {
-  ChangeDetectionStrategy,
+  ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   forwardRef, HostBinding, HostListener, Input,
   OnInit, Optional,
@@ -29,7 +29,7 @@ export class CheckboxComponent implements OnInit,ControlValueAccessor {
 
   @Input() value
 
-  constructor(@Optional() private parent:CheckboxGroupComponent) { }
+  constructor(private cdr:ChangeDetectorRef, @Optional() private parent:CheckboxGroupComponent) { }
 
   ngOnInit(): void {
     if (this.parent) {
@@ -42,9 +42,9 @@ export class CheckboxComponent implements OnInit,ControlValueAccessor {
     if (!this.disabled) {
       this.checked = !this.checked
       this.onChanged(this.checked)
-    }
-    if (this.parent) {
-      this.parent.handleCheckboxClick(this.value,this.checked)
+      if (this.parent) {
+        this.parent.handleCheckboxClick(this.value,this.checked)
+      }
     }
   }
 
@@ -53,6 +53,7 @@ export class CheckboxComponent implements OnInit,ControlValueAccessor {
 
   writeValue(value: boolean): void {
     this.checked = value
+    this.cdr.markForCheck()
   }
 
   registerOnChange(fn: (value:boolean) => void): void {

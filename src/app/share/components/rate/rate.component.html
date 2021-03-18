@@ -1,0 +1,9 @@
+<div class="xm-rate-wrap" (mouseleave)="rateLeave()">
+  <xm-rate-item
+    *ngFor="let item of startArray; index as i"
+    (itemClick)="rateClick($event,i)"
+    (itemHover)="rateHover($event,i)"
+    [rateItemCls]="rateItemStyles[i]"
+    [tpl]="tpl"
+  ></xm-rate-item>
+</div>

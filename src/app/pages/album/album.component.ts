@@ -53,7 +53,6 @@ export class AlbumComponent implements OnInit {
       this.trackParams.albumId = this.route.snapshot.paramMap.get('albumId')
       this.initPageData()
     })
-
   }
 
   checkedChange(checked: boolean, track: Track): void {
@@ -82,7 +81,6 @@ export class AlbumComponent implements OnInit {
     return this.selectedTracks.findIndex(item => item.trackId === id)
   }
   checkAllChange(checked):void {
-    console.log(checked)
     this.tracks.forEach(item=>{
       const targetIndex = this.selectedIndex(item.trackId)
       if (checked && targetIndex === -1) {
@@ -97,7 +95,6 @@ export class AlbumComponent implements OnInit {
     })
   }
   changePage(page: number): void {
-    console.log(this.trackParams.pageNum)
     if (this.trackParams.pageNum !== page) {
       this.trackParams.pageNum = page
       console.log(this.trackParams.pageNum)
@@ -132,10 +129,8 @@ export class AlbumComponent implements OnInit {
       this.albumServe.relateAlbums(this.trackParams.albumId)
     ]).subscribe(([albumInfo, score, relateAlbum]) => {
       this.albumInfo = {...albumInfo.mainInfo, albumId: albumInfo.albumId}
-      this.score = score
+      this.score = score / 2
       this.anchor = albumInfo.anchorInfo
-      // this.tracks = albumInfo.tracksInfo.tracks
-      // this.total = albumInfo.tracksInfo.trackTotalCount
       this.updateTracks()
       this.relateAlbums = relateAlbum.slice(0, 10)
       this.categoryServe.getCategory().pipe(first()).subscribe(category => {

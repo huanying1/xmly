@@ -18,6 +18,10 @@ import {OverlayRef, OverlayService} from "../../services/tools/overlay.service";
 import {AbstractControl, FormBuilder, ValidationErrors, Validators} from "@angular/forms";
 import {isPlatformBrowser} from "@angular/common";
 import {animate, style, transition, trigger, AnimationEvent} from "@angular/animations";
+import {UserService} from "../../services/apis/user.service";
+import {WindowService} from "../../services/tools/window.service";
+import {storageKeys} from "../../config";
+import {ContextService} from "../../services/business/context.service";
 
 interface FormControls {
   [key: string]: {
@@ -62,12 +66,13 @@ export class LoginComponent implements OnChanges {
   @Output() hide = new EventEmitter<void>()
   private overlayRef: OverlayRef
   visible = false
+  remember = false
   formValues = this.fb.group({
-    phone: ['', [
+    phone: ['13647008979', [
       Validators.required,
       Validators.pattern(/^1\d{10}$/)
     ]],
-    password: ['', [
+    password: ['angular10', [
       Validators.required,
       Validators.minLength(6)
     ]]
@@ -78,7 +83,10 @@ export class LoginComponent implements OnChanges {
     private overlayServe: OverlayService,
     private rd2: Renderer2,
     private fb: FormBuilder,
-    @Inject(PLATFORM_ID) private platformId: object
+    @Inject(PLATFORM_ID) private platformId: object,
+    private userServer:UserService,
+    private windowServe:WindowService,
+    private contextServe:ContextService
   ) {
   }
 
@@ -92,7 +100,15 @@ export class LoginComponent implements OnChanges {
   }
 
   submit() {
-    console.log('submit')
+    this.userServer.login(this.formValues.value).subscribe(({user,token}) => {
+      this.contextServe.setUser(user)
+      this.windowServe.setStorage(storageKeys.auth,token)
+      if (!this.remember) {
+        this.windowServe.setStorage(storageKeys.remember,'true')
+      }
+      this.hide.emit()
+      alert('登陆成功')
+    })
   }
 
   create() {

@@ -8,6 +8,7 @@ import {PagesModule} from "./pages/pages.module";
 import { LoginComponent } from './layouts/login/login.component';
 import {ReactiveFormsModule} from "@angular/forms";
 import {CheckboxModule} from "./share/components/checkbox/checkbox.module";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 
 @NgModule({
@@ -20,6 +21,7 @@ import {CheckboxModule} from "./share/components/checkbox/checkbox.module";
     BreadcrumbModule,
     ReactiveFormsModule,
     CheckboxModule,
+    BrowserAnimationsModule
   ],
   exports: [
     HeaderComponent,

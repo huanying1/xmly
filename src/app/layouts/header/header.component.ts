@@ -5,7 +5,7 @@ import {
   Inject,
   ElementRef,
   AfterViewInit,
-  ChangeDetectorRef
+  ChangeDetectorRef, Output, EventEmitter
 } from '@angular/core';
 import {User} from "../../services/apis/types";
 import {DOCUMENT} from "@angular/common";
@@ -35,27 +35,31 @@ import {debounceTime, distinctUntilChanged} from "rxjs/operators";
   //   ])
   // ]
 })
-export class HeaderComponent implements OnInit,AfterViewInit {
-  user:User
-  fix:boolean = false
+export class HeaderComponent implements OnInit, AfterViewInit {
+  user: User
+  fix: boolean = false
+  @Output() login = new EventEmitter<void>()
+
   constructor(
-    @Inject(DOCUMENT) private doc:Document,
-    private el:ElementRef,
-    private cdr:ChangeDetectorRef
-  ) { }
+    @Inject(DOCUMENT) private doc: Document,
+    private el: ElementRef,
+    private cdr: ChangeDetectorRef
+  ) {
+  }
 
   ngOnInit(): void {
 
   }
-  ngAfterViewInit():void {
-    fromEvent(this.doc,'scroll')
-      .pipe(debounceTime(300),distinctUntilChanged())
-      .subscribe(()=> {
+
+  ngAfterViewInit(): void {
+    fromEvent(this.doc, 'scroll')
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe(() => {
         const top = this.doc.documentElement.scrollTop
         const clientHeight = this.el.nativeElement.clientHeight
         if (top > clientHeight) {
           this.fix = true
-        }else if(top === 0) {
+        } else if (top === 0) {
           this.fix = false
         }
         this.cdr.markForCheck()

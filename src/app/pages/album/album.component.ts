@@ -69,7 +69,8 @@ export class AlbumComponent implements OnInit {
   isChecked(id: number): boolean {
     return this.selectedIndex(id) > -1
   }
-  isCheckedAll():boolean {
+
+  isCheckedAll(): boolean {
     if (this.selectedTracks.length >= this.tracks.length && this.selectedTracks.length !== 0) {
       return this.tracks.every(item => {
         return this.selectedIndex(item.trackId) > -1
@@ -77,27 +78,27 @@ export class AlbumComponent implements OnInit {
     }
     return false
   }
+
   private selectedIndex(id: number): number {
     return this.selectedTracks.findIndex(item => item.trackId === id)
   }
-  checkAllChange(checked):void {
-    this.tracks.forEach(item=>{
+
+  checkAllChange(checked): void {
+    this.tracks.forEach(item => {
       const targetIndex = this.selectedIndex(item.trackId)
       if (checked && targetIndex === -1) {
-          console.log('checked true')
-          this.selectedTracks.push(item)
+        this.selectedTracks.push(item)
       } else {
         if (targetIndex > -1) {
-          console.log('checked false')
-          this.selectedTracks.splice(targetIndex,1)
+          this.selectedTracks.splice(targetIndex, 1)
         }
       }
     })
   }
+
   changePage(page: number): void {
     if (this.trackParams.pageNum !== page) {
       this.trackParams.pageNum = page
-      console.log(this.trackParams.pageNum)
       this.updateTracks()
     }
   }

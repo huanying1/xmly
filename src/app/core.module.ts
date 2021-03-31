@@ -10,6 +10,8 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {CheckboxModule} from "./share/components/checkbox/checkbox.module";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {InterceptorService} from "./services/apis/interceptor.service";
+import {DirectivesModule} from "./share/directives/directives.module";
+import {MessageModule} from "./share/components/message/message.module";
 
 
 @NgModule({
@@ -23,14 +25,17 @@ import {InterceptorService} from "./services/apis/interceptor.service";
     ReactiveFormsModule,
     CheckboxModule,
     BrowserAnimationsModule,
-    FormsModule
+    FormsModule,
+    DirectivesModule,
+    MessageModule
   ],
   exports: [
     HeaderComponent,
     BreadcrumbModule,
     BrowserModule,
     AppRoutingModule,
-    LoginComponent
+    LoginComponent,
+    MessageModule
   ],
   providers:[
     {

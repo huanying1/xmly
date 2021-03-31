@@ -1,4 +1,6 @@
 <div
+  xmDrag
+  [limitInWindow]="true"
   class="xm-modal-wrap"
   #modalWrap
   @modalAnimate
@@ -6,7 +8,7 @@
   *ngIf="visible"
 >
   <div class="xm-modal">
-    <div class="head">
+    <div class="head" xmDragHandler>
       <p>Angular 10</p>
     </div>
     <div class="form-wrap">

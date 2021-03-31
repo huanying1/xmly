@@ -22,6 +22,7 @@ import {UserService} from "../../services/apis/user.service";
 import {WindowService} from "../../services/tools/window.service";
 import {storageKeys} from "../../config";
 import {ContextService} from "../../services/business/context.service";
+import {MessageService} from "../../share/components/message/message.service";
 
 interface FormControls {
   [key: string]: {
@@ -86,7 +87,8 @@ export class LoginComponent implements OnChanges {
     @Inject(PLATFORM_ID) private platformId: object,
     private userServer:UserService,
     private windowServe:WindowService,
-    private contextServe:ContextService
+    private contextServe:ContextService,
+    private messageServe:MessageService
   ) {
   }
 
@@ -107,7 +109,7 @@ export class LoginComponent implements OnChanges {
         this.windowServe.setStorage(storageKeys.remember,'true')
       }
       this.hide.emit()
-      alert('登陆成功')
+      this.messageServe.success('登陆成功')
     })
   }
 

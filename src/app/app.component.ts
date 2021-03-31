@@ -9,6 +9,7 @@ import {WindowService} from "./services/tools/window.service";
 import {UserService} from "./services/apis/user.service";
 import {ContextService} from "./services/business/context.service";
 import {storageKeys} from "./config";
+import {MessageService} from "./share/components/message/message.service";
 
 @Component({
   selector: 'xm-root',
@@ -17,10 +18,10 @@ import {storageKeys} from "./config";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
-  currentCategory: Category;
-  categories: Category[] = [];
-  categoryPinyin: string = '';
-  subCategory: string[] = [];
+  currentCategory: Category
+  categories: Category[] = []
+  categoryPinyin: string = ''
+  subCategory: string[] = []
   showLogin = false
 
   constructor(
@@ -31,7 +32,8 @@ export class AppComponent implements OnInit {
     private overlayServe: OverlayService,
     private windowServe: WindowService,
     private userServe: UserService,
-    private contextServe: ContextService
+    private contextServe: ContextService,
+    private messageServe:MessageService
   ) {
 
   }
@@ -42,8 +44,8 @@ export class AppComponent implements OnInit {
         this.contextServe.setUser(user)
         this.windowServe.setStorage(storageKeys.auth, token)
       }, error => {
-        console.error(error)
         this.clearStorage()
+        throw new Error(error)
       })
     }
     this.init()
@@ -85,7 +87,7 @@ export class AppComponent implements OnInit {
     this.userServe.logout().subscribe(() => {
       this.contextServe.setUser(null)
       this.clearStorage()
-      alert('退出成功')
+      this.messageServe.success('退出成功')
     })
   }
 

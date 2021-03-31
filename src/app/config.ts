@@ -4,5 +4,5 @@ export const storageKeys = {
   metas: 'metas',
   auth: 'xm-auth',
   remember:'remember',
-  needToken:'needtOKEN'
+  needToken:'needToken'
 }

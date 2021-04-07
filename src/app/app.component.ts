@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {AlbumService} from "./services/apis/album.service";
-import {Category} from "./services/apis/types";
+import {AlbumInfo, Category, Track} from "./services/apis/types";
 import {CategoryService} from "./services/business/category.service";
 import {Router} from "@angular/router";
 import {combineLatest} from "rxjs";
@@ -10,6 +10,7 @@ import {UserService} from "./services/apis/user.service";
 import {ContextService} from "./services/business/context.service";
 import {storageKeys} from "./config";
 import {MessageService} from "./share/components/message/message.service";
+import {PlayerService} from "./services/business/player.service";
 
 @Component({
   selector: 'xm-root',
@@ -23,6 +24,14 @@ export class AppComponent implements OnInit {
   categoryPinyin: string = ''
   subCategory: string[] = []
   showLogin = false
+  showPlayer = false
+  playerInfo: {
+    trackList: Track[]
+    currentIndex: number
+    currentTrack: Track
+    album: AlbumInfo
+    playing: boolean
+  }
 
   constructor(
     private albumServe: AlbumService,
@@ -33,7 +42,8 @@ export class AppComponent implements OnInit {
     private windowServe: WindowService,
     private userServe: UserService,
     private contextServe: ContextService,
-    private messageServe:MessageService
+    private messageServe: MessageService,
+    private playerServe: PlayerService
   ) {
 
   }
@@ -49,13 +59,14 @@ export class AppComponent implements OnInit {
       })
     }
     this.init()
+    this.watchPlayer()
   }
 
   private init(): void {
-    combineLatest(
-      [this.categoryServe.getCategory(),
-        this.categoryServe.getSubCategory()]
-    ).subscribe(([category, subCategory]) => {
+    combineLatest([
+      this.categoryServe.getCategory(),
+      this.categoryServe.getSubCategory()
+    ]).subscribe(([category, subCategory]) => {
       if (category !== this.categoryPinyin) {
         this.categoryPinyin = category
         if (this.categories.length) {
@@ -65,6 +76,28 @@ export class AppComponent implements OnInit {
       this.subCategory = subCategory
     })
     this.getCategories()
+  }
+
+  private watchPlayer(): void {
+    combineLatest([
+      this.playerServe.getTracks(),
+      this.playerServe.getCurrentIndex(),
+      this.playerServe.getCurrentTrack(),
+      this.playerServe.getAlbum(),
+      this.playerServe.getPlaying(),
+    ]).subscribe(([trackList, currentIndex, currentTrack, album, playing]) => {
+      this.playerInfo = {
+        trackList,
+        currentIndex,
+        currentTrack,
+        album,
+        playing
+      }
+      if (currentTrack) {
+        this.showPlayer = true
+        this.cdr.markForCheck()
+      }
+    })
   }
 
   changeCategory(category) {

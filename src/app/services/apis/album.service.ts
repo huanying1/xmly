@@ -1,11 +1,21 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {map} from "rxjs/operators";
 import {environment} from "../../../environments/environment";
-import {Album, AlbumInfo, Anchor, Base, Category, MetaData, RelateAlbum, SubCategory, TracksInfo} from "./types";
+import {
+  Album,
+  AlbumInfo,
+  Anchor,
+  Base,
+  Category,
+  MetaData,
+  RelateAlbum,
+  SubCategory,
+  TrackAudio,
+  TracksInfo
+} from "./types";
 import {stringify} from "querystring";
-
 
 
 export interface CategoryInfo {
@@ -52,51 +62,62 @@ export interface AlbumTrackArgs {
 })
 export class AlbumService {
   readonly prefix = '/xmly/'
-  constructor(private http:HttpClient) { }
+
+  constructor(private http: HttpClient) {
+  }
 
   //一级分类
-  categories(categoryId = 3):Observable<Category[]> {
-    const params = new HttpParams().set('categoryId',categoryId.toString())
+  categories(categoryId = 3): Observable<Category[]> {
+    const params = new HttpParams().set('categoryId', categoryId.toString())
     return this.http
-      .get(`${environment.baseUrl}${this.prefix}breadcrumb`,{params})
-      .pipe(map((res:Base<{ categories: Category[] }>) => res.data.categories))
+      .get(`${environment.baseUrl}${this.prefix}breadcrumb`, {params})
+      .pipe(map((res: Base<{ categories: Category[] }>) => res.data.categories))
   }
 
   //二三级分类
   detailCategoryPageInfo(args: Pick<AlbumArgs, 'category' | 'subcategory'>): Observable<CategoryInfo> {
     return this.http
-        .get(`${environment.baseUrl}${this.prefix}categories`, { params:args })
-        .pipe(map((res: Base<CategoryInfo>) => res.data));
+      .get(`${environment.baseUrl}${this.prefix}categories`, {params: args})
+      .pipe(map((res: Base<CategoryInfo>) => res.data));
   }
+
   //获取专辑列表
-  albums(args:AlbumArgs):Observable<AlbumsInfo> {
-    const params = new HttpParams({fromString:stringify(args)})
+  albums(args: AlbumArgs): Observable<AlbumsInfo> {
+    const params = new HttpParams({fromString: stringify(args)})
     return this.http
-      .get(`${environment.baseUrl}${this.prefix}albums`,{params})
-      .pipe(map((res:Base<AlbumsInfo>) => res.data))
+      .get(`${environment.baseUrl}${this.prefix}albums`, {params})
+      .pipe(map((res: Base<AlbumsInfo>) => res.data))
   }
+
   // 专辑详情
   album(albumId: string): Observable<AlbumRes> {
     const params = new HttpParams().set('albumId', albumId);
-    return this.http.get(`${environment.baseUrl}${this.prefix}album`, { params })
+    return this.http.get(`${environment.baseUrl}${this.prefix}album`, {params})
       .pipe(map((res: Base<AlbumRes>) => res.data));
   }
+
   // 评分
   albumScore(albumId: string): Observable<number> {
     return this.http.get(`${environment.baseUrl}${this.prefix}album-score/${albumId}`)
       .pipe(map((res: Base<{ albumScore: number }>) => res.data.albumScore || 0));
   }
+
   // 相关专辑列表
   relateAlbums(albumId: string): Observable<RelateAlbum[]> {
     const params = new HttpParams().set('id', albumId);
-    return this.http.get(`${environment.baseUrl}${this.prefix}album-relate`, { params })
+    return this.http.get(`${environment.baseUrl}${this.prefix}album-relate`, {params})
       .pipe(map((res: Base<{ hotWordAlbums: RelateAlbum[] }>) => res.data.hotWordAlbums));
   }
 
   tracks(args: AlbumTrackArgs): Observable<TracksInfo> {
-    const params = new HttpParams({ fromString: stringify(args) });
-    return this.http.get(`${environment.baseUrl}${this.prefix}album-tracks`, { params })
+    const params = new HttpParams({fromString: stringify(args)});
+    return this.http.get(`${environment.baseUrl}${this.prefix}album-tracks`, {params})
       .pipe(map((res: Base<TracksInfo>) => res.data));
+  }
+
+  trackAudio(id: number): Observable<TrackAudio> {
+    return this.http.get(`${environment.baseUrl}${this.prefix}album-track-url/${id}`)
+      .pipe(map((res: Base<TrackAudio>) => res.data))
   }
 }
 

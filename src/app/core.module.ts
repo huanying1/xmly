@@ -12,10 +12,12 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {InterceptorService} from "./services/apis/interceptor.service";
 import {DirectivesModule} from "./share/directives/directives.module";
 import {MessageModule} from "./share/components/message/message.module";
+import { PlayerComponent } from './layouts/player/player.component';
+import {NumberLoopPipe} from "./share/pipes/number-loop.pipe";
 
 
 @NgModule({
-  declarations: [HeaderComponent, LoginComponent],
+  declarations: [HeaderComponent, LoginComponent, PlayerComponent, NumberLoopPipe],
   imports: [
     BrowserModule,
     HttpClientModule,
@@ -35,7 +37,8 @@ import {MessageModule} from "./share/components/message/message.module";
     BrowserModule,
     AppRoutingModule,
     LoginComponent,
-    MessageModule
+    MessageModule,
+    PlayerComponent
   ],
   providers:[
     {

@@ -6,6 +6,7 @@ import {AlbumInfo, Anchor, RelateAlbum, Track} from "../../services/apis/types";
 import {CategoryService} from "../../services/business/category.service";
 import {IconType} from "../../share/directives/icon/types";
 import {first} from "rxjs/operators";
+import {PlayerService} from "../../services/business/player.service";
 
 interface MoreState {
   full: boolean,
@@ -45,6 +46,7 @@ export class AlbumComponent implements OnInit {
     private albumServe: AlbumService,
     private categoryServe: CategoryService,
     private cdr: ChangeDetectorRef,
+    private playerServe:PlayerService
   ) {
   }
 
@@ -53,6 +55,13 @@ export class AlbumComponent implements OnInit {
       this.trackParams.albumId = this.route.snapshot.paramMap.get('albumId')
       this.initPageData()
     })
+  }
+
+  playAll(): void {
+    console.log(this.tracks)
+    this.playerServe.setTracks(this.tracks)
+    this.playerServe.setCurrentIndex(0)
+    this.playerServe.setAlbum(this.albumInfo)
   }
 
   checkedChange(checked: boolean, track: Track): void {

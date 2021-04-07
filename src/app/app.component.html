@@ -28,4 +28,14 @@
   </div>
 </div>
 <xm-login [show]="showLogin" (hide)="showLogin = false"></xm-login>
-<!--<xm-message></xm-message>-->
+<xm-player
+  *ngIf="showPlayer"
+  [trackList]="playerInfo.trackList"
+  [currentIndex]="playerInfo.currentIndex"
+  [currentTrack]="playerInfo.currentTrack"
+  [album]="playerInfo.album"
+  [playing]="playerInfo.playing"
+>
+
+</xm-player>
+

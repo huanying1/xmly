@@ -1,12 +1,14 @@
 import {Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
 import {AlbumArgs, AlbumService, AlbumsInfo, CategoryInfo} from "../../services/apis/album.service";
-import {Album, MetaValue, SubCategory} from "../../services/apis/types";
+import {Album, AlbumInfo, MetaValue, SubCategory} from "../../services/apis/types";
 import {ActivatedRoute} from "@angular/router";
 import {CategoryService} from "../../services/business/category.service";
 import {withLatestFrom} from "rxjs/operators";
 import {forkJoin} from "rxjs";
 import {WindowService} from "../../services/tools/window.service";
 import {storageKeys} from "../../config";
+import {PlayerService} from "../../services/business/player.service";
+import {main} from "@angular/compiler-cli/src/main";
 
 interface CheckedMeta {
   metaRowId: number
@@ -35,12 +37,14 @@ export class AlbumsComponent implements OnInit {
   checkedMetas: CheckedMeta[] = []
   albumsInfo: AlbumsInfo
   sorts: string[] = ['综合排序', '最近更新', '播放最多']
+
   constructor(
     private albumsServe: AlbumService,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
     private categoryServe: CategoryService,
-    private windowServe: WindowService
+    private windowServe: WindowService,
+    private playerServe: PlayerService
   ) {
   }
 
@@ -72,6 +76,16 @@ export class AlbumsComponent implements OnInit {
         }
         this.updatePageData(needSetStatus)
       })
+  }
+
+  playAlbum(event: MouseEvent, albumId: number): void {
+    event.stopPropagation()
+    this.albumsServe.album(albumId.toString()).subscribe(({mainInfo, tracksInfo}) => {
+      this.playerServe.setTracks(tracksInfo.tracks)
+      this.playerServe.setCurrentIndex(0)
+      this.playerServe.setAlbum({...mainInfo, albumId})
+    })
+
   }
 
   changeSubCategory(subCategory?: SubCategory): void {
@@ -183,18 +197,18 @@ export class AlbumsComponent implements OnInit {
         //从详情导航过来的标签不一定存在
         const {id: metaRowId, name, metaValues} = targetRow || metadata[0]
         const targetMeta = metaValues.find(item => item.id === Number(meta[1]))
-        const {id,displayName} = targetMeta || metaValues[0]
+        const {id, displayName} = targetMeta || metaValues[0]
         this.checkedMetas.push({
           metaRowId,
-          metaRowName:name,
-          metaId:id,
-          metaName:displayName
+          metaRowName: name,
+          metaId: id,
+          metaName: displayName
         })
       })
     }
   }
 
-  changePage(newPageNum:number):void {
+  changePage(newPageNum: number): void {
     if (this.searchParams.page !== newPageNum) {
       this.searchParams.page = newPageNum
       this.updateAlbums()

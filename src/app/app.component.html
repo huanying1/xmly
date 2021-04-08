@@ -35,6 +35,8 @@
   [currentTrack]="playerInfo.currentTrack"
   [album]="playerInfo.album"
   [playing]="playerInfo.playing"
+  (closed)="closePlayer()"
+  @fadePlayer
 >
 
 </xm-player>

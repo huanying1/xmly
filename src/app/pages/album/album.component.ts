@@ -1,12 +1,13 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {AlbumService, AlbumTrackArgs} from "../../services/apis/album.service";
-import {forkJoin} from "rxjs";
+import {combineLatest, forkJoin, Subject} from "rxjs";
 import {AlbumInfo, Anchor, RelateAlbum, Track} from "../../services/apis/types";
 import {CategoryService} from "../../services/business/category.service";
 import {IconType} from "../../share/directives/icon/types";
-import {first} from "rxjs/operators";
+import {first, takeUntil} from "rxjs/operators";
 import {PlayerService} from "../../services/business/player.service";
+import {MessageService} from "../../share/components/message/message.service";
 
 interface MoreState {
   full: boolean,
@@ -20,7 +21,7 @@ interface MoreState {
   styleUrls: ['./album.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AlbumComponent implements OnInit {
+export class AlbumComponent implements OnInit, OnDestroy {
   selectedTracks: Track[] = []
   albumInfo: AlbumInfo
   score: number
@@ -40,25 +41,86 @@ export class AlbumComponent implements OnInit {
     icon: 'arrow-down-line'
   }
   articleHeight: number
+  private destroy$ = new Subject<void>()
+  private currentTrack: Track
+  private playing: boolean
 
   constructor(
     private route: ActivatedRoute,
     private albumServe: AlbumService,
     private categoryServe: CategoryService,
     private cdr: ChangeDetectorRef,
-    private playerServe:PlayerService
+    private playerServe: PlayerService,
+    private messageServe: MessageService
   ) {
   }
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(() => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.trackParams.albumId = this.route.snapshot.paramMap.get('albumId')
       this.initPageData()
+      this.watchPlayer()
     })
   }
 
+  play(needPlay: boolean): void {
+    if (this.selectedTracks.length) {
+      if (needPlay) {
+        this.playerServe.playTracks(this.selectedTracks)
+      } else {
+        this.playerServe.addTracks(this.selectedTracks)
+        this.messageServe.info('已添加')
+      }
+      this.setAlbumInfo()
+      this.checkAllChange(false)
+    } else {
+      this.messageServe.warning('未选中任何曲目')
+    }
+  }
+
+  private setAlbumInfo(): void {
+    if (!this.currentTrack) {
+      this.playerServe.setAlbum(this.albumInfo)
+    }
+  }
+
+  watchPlayer(): void {
+    combineLatest([
+      this.playerServe.getCurrentTrack(),
+      this.playerServe.getPlaying()
+    ]).pipe(takeUntil(this.destroy$)).subscribe(([track, playing]) => {
+      this.currentTrack = track
+      this.playing = playing
+      this.cdr.markForCheck()
+    })
+  }
+
+  itemCls(id: number): string {
+    let result = 'item-name '
+    if (this.currentTrack) {
+      if (this.playing) {
+        if (this.currentTrack.trackId === id) {
+          result += 'item-name-playing'
+        }
+      } else {
+        if (this.currentTrack.trackId === id) {
+          result += 'item-name-pause'
+        }
+      }
+    }
+    return result
+  }
+
+  toggleTrack(track: Track, act: 'play' | 'pause'): void {
+    if (act === 'pause') {
+      this.playerServe.setPlaying(false)
+    } else {
+      this.setAlbumInfo()
+      this.playerServe.playTrack(track)
+    }
+  }
+
   playAll(): void {
-    console.log(this.tracks)
     this.playerServe.setTracks(this.tracks)
     this.playerServe.setCurrentIndex(0)
     this.playerServe.setAlbum(this.albumInfo)
@@ -137,7 +199,7 @@ export class AlbumComponent implements OnInit {
       this.albumServe.album(this.trackParams.albumId),
       this.albumServe.albumScore(this.trackParams.albumId),
       this.albumServe.relateAlbums(this.trackParams.albumId)
-    ]).subscribe(([albumInfo, score, relateAlbum]) => {
+    ]).pipe(first()).subscribe(([albumInfo, score, relateAlbum]) => {
       this.albumInfo = {...albumInfo.mainInfo, albumId: albumInfo.albumId}
       this.score = score / 2
       this.anchor = albumInfo.anchorInfo
@@ -156,5 +218,10 @@ export class AlbumComponent implements OnInit {
 
   trackByTracks(index: number, item: Track): number {
     return item.trackId
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next()
+    this.destroy$.complete()
   }
 }

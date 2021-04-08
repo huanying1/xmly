@@ -16,7 +16,6 @@ export class ImgLazyDirective implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.host = this.el.nativeElement
     this.io = new IntersectionObserver(entries => {
-      console.log(entries)
       const ratio = entries[0].intersectionRatio
       if (ratio > 0 && this.changeTimes === 0) {
         this.changeSrc()

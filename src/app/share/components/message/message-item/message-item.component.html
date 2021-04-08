@@ -8,7 +8,7 @@
 >
   <div [class]="itemCls">
     <div class="content">
-      {{message.content}}
+      <ng-container *xmStrTplOutlet="message.content">{{message.content}}</ng-container>
     </div>
     <i xmIcon="Close" class="close" (click)="close()" *ngIf="message.options.showClose"></i>
   </div>

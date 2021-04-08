@@ -6,8 +6,8 @@
   border-radius: 50%;
   animation: ripples .5s linear;
   &:after {
-    display: block;
     content: '';
+    display: block;
     padding-top: 100%;
   }
 }

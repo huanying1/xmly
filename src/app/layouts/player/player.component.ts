@@ -186,7 +186,7 @@ export class PlayerComponent implements OnInit, OnChanges {
 
   ended(): void {
     this.playerServe.setPlaying(false)
-    this.playerServe.setCurrentIndex(this.currentIndex + 1)
+    this.next(this.currentIndex + 1)
   }
 
   error(): void {
@@ -215,8 +215,8 @@ export class PlayerComponent implements OnInit, OnChanges {
       this.putAway = true
     }
   }
+
   hoverHost():void {
-    console.log(this.putAway)
     if (this.putAway) {
       const maxLeft = this.doc.documentElement.clientWidth - this.hostEL.getBoundingClientRect().width
       this.rd2.setStyle(this.hostEL,'left',maxLeft + 'px')

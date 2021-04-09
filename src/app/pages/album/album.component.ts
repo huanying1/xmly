@@ -8,6 +8,7 @@ import {IconType} from "../../share/directives/icon/types";
 import {first, takeUntil} from "rxjs/operators";
 import {PlayerService} from "../../services/business/player.service";
 import {MessageService} from "../../share/components/message/message.service";
+import {PageService} from "../../services/tools/page.service";
 
 interface MoreState {
   full: boolean,
@@ -51,7 +52,9 @@ export class AlbumComponent implements OnInit, OnDestroy {
     private categoryServe: CategoryService,
     private cdr: ChangeDetectorRef,
     private playerServe: PlayerService,
-    private messageServe: MessageService
+    private messageServe: MessageService,
+    private pageServe: PageService
+
   ) {
   }
 
@@ -212,6 +215,11 @@ export class AlbumComponent implements OnInit, OnDestroy {
         }
       })
       this.categoryServe.setSubCategory([this.albumInfo.albumTitle])
+      this.pageServe.setPageInfo(
+        this.albumInfo.albumTitle,
+        '专辑详情',
+        '小说,音乐,教育,二次元...'
+      )
       this.cdr.markForCheck()
     })
   }

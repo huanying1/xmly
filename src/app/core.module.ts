@@ -13,6 +13,7 @@ import {InterceptorService} from "./services/apis/interceptor.service";
 import {DirectivesModule} from "./share/directives/directives.module";
 import {MessageModule} from "./share/components/message/message.module";
 import { PlayerComponent } from './layouts/player/player.component';
+import {BackTopModule} from "./share/components/back-top/back-top.module";
 
 
 @NgModule({
@@ -28,7 +29,8 @@ import { PlayerComponent } from './layouts/player/player.component';
     BrowserAnimationsModule,
     FormsModule,
     DirectivesModule,
-    MessageModule
+    MessageModule,
+    BackTopModule
   ],
   exports: [
     HeaderComponent,
@@ -37,7 +39,8 @@ import { PlayerComponent } from './layouts/player/player.component';
     AppRoutingModule,
     LoginComponent,
     MessageModule,
-    PlayerComponent
+    PlayerComponent,
+    BackTopModule
   ],
   providers:[
     {

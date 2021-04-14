@@ -46,7 +46,6 @@ export class VolumeDirective implements AfterViewInit {
   }
 
   setVolume(top:number) {
-    console.log(top)
     this.rd2.setStyle(this.bar,'height',top + 'px')
     const volume = (this.barHeight * (top * 0.01) * 0.01)
     this.volume.emit(volume)
@@ -100,7 +99,6 @@ export class VolumeDirective implements AfterViewInit {
   }
 
   moveEnd() {
-    console.log('end')
     this.toggleMoving(false)
   }
 

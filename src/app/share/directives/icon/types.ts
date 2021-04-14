@@ -18,4 +18,6 @@ export type IconType =
   | 'arrow-up-line'
   | 'arrow-down-line'
   | 'Star'
-  | 'mulu';
+  | 'mulu'
+  | 'laba'
+  | 'mute_icon'

@@ -5,12 +5,13 @@ import {ToggleMoreDirective} from './toggle-more.directive';
 import {DragModule} from "./drag/drag.module";
 import { ImgLazyDirective } from './img-lazy.directive';
 import { RipplesDirective } from './ripples.directive';
+import { VolumeDirective } from './volume.directive';
 
 
 @NgModule({
-  declarations: [StrTplOutletDirective, IconDirective, ToggleMoreDirective, ImgLazyDirective, RipplesDirective],
+  declarations: [StrTplOutletDirective, IconDirective, ToggleMoreDirective, ImgLazyDirective, RipplesDirective, VolumeDirective],
   imports: [DragModule],
-  exports: [StrTplOutletDirective, IconDirective, ToggleMoreDirective, DragModule, ImgLazyDirective, RipplesDirective]
+  exports: [StrTplOutletDirective, IconDirective, ToggleMoreDirective, DragModule, ImgLazyDirective, RipplesDirective, VolumeDirective]
 })
 export class DirectivesModule {
 }

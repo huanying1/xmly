@@ -3,7 +3,7 @@
   <div class="content">
     <div class="container">
       <div class="breadcrumb-wrap">
-          <xm-breadcrumb>
+        <xm-breadcrumb>
           <xm-breadcrumb-item>全部分类</xm-breadcrumb-item>
           <xm-breadcrumb-item>
             <div class="sub-category">
@@ -13,7 +13,8 @@
               </div>
               <div class="category-box">
                 <ul>
-                  <li (click)="changeCategory(item)" [class.checked]="item.id === currentCategory?.id" *ngFor="let item of categories;">{{item.displayName}}</li>
+                  <li (click)="changeCategory(item)" [class.checked]="item.id === currentCategory?.id"
+                      *ngFor="let item of categories;">{{item.displayName}}</li>
                 </ul>
               </div>
             </div>

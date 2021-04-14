@@ -50,6 +50,7 @@ import {BackTopModule} from "./share/components/back-top/back-top.module";
     }
   ]
 })
+
 export class CoreModule {
   constructor(@SkipSelf() @Optional() parentModules: CoreModule) {
     if (parentModules) {

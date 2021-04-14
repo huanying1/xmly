@@ -144,9 +144,9 @@
         cursor: pointer;
         margin-right: 14px;
         outline: none;
-        &:nth-child(7n) {
-          margin-right: 0;
-        }
+        //&:nth-child(7n) {
+        //  margin-right: 0;
+        //}
         &:hover {
           .cover {
             .thumbnail {

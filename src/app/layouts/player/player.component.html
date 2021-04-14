@@ -6,20 +6,35 @@
 >
   <div class="xm-player" #player>
     <div class="thumbnail">
-      <img xmDragHandler [src]="album.cover || '../../../assets/images/default-pic.jpg'" />
+      <img xmDragHandler [src]="album.cover || '../../../assets/images/default-pic.jpg'"/>
     </div>
     <div class="middle">
       <div class="operate">
         <i class="icon icon-prev" xmIcon="previous" (click)="prev(currentIndex - 1)"></i>
-        <i class="icon icon-toggle" (click)="togglePlay()" [xmIcon]="playing && trackList.length ? 'pause' : 'play'"></i>
+        <i class="icon icon-toggle" (click)="togglePlay()"
+           [xmIcon]="playing && trackList.length ? 'pause' : 'play'"></i>
         <i class="icon icon-next" xmIcon="next" (click)="next(currentIndex + 1)"></i>
       </div>
+    </div>
+    <div class="volume">
+      <i class="icon" xmIcon="laba" (click)="isShowVolumeBar()">
+        <span class="volume-box" @isShowVolumeBar *ngIf="isShow && !putAway">
+          <span class="volume-controller">
+            <span class="bar">
+              <span class="circle" xmVolume (volume)="setVolume($event)"></span>
+            </span>
+          </span>
+          <i class="is-prosody" (click)="changeVolume($event)" [xmIcon]="isProsody ? 'mute_icon' : 'laba'"></i>
+        </span>
+      </i>
     </div>
     <div class="list" (click)="togglePanel(!showPanel)">
       <i class="icon" xmIcon="mulu"></i>
     </div>
     <div class="close" (click)="closed.emit()">
       <i class="icon" xmIcon="Close"></i>
+    </div>
+    <div>
     </div>
   </div>
   <div class="xm-player-panel" @playerPanel [class.down]="isDown" *ngIf="trackList.length && showPanel && !putAway">

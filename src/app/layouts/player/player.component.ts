@@ -7,7 +7,7 @@ import {
   ElementRef,
   Output,
   EventEmitter,
-  OnChanges, SimpleChanges, Inject, Renderer2
+  OnChanges, SimpleChanges, Inject, Renderer2, AfterViewInit, ChangeDetectorRef
 } from '@angular/core';
 import {AlbumInfo, Track} from "../../services/apis/types";
 import {PlayerService} from "../../services/business/player.service";
@@ -15,7 +15,7 @@ import {animate, style, transition, trigger} from "@angular/animations";
 import {DOCUMENT} from "@angular/common";
 
 const PANEL_HEIGHT = 280 //播放器的列表最大高度
-const THUMBNAIL_WIDTH  = 50 //播放器的专辑封面宽度
+const THUMBNAIL_WIDTH = 50 //播放器的专辑封面宽度
 
 @Component({
   selector: 'xm-player',
@@ -41,6 +41,21 @@ const THUMBNAIL_WIDTH  = 50 //播放器的专辑封面宽度
           height: 0
         }))
       ])
+    ]),
+    trigger('isShowVolumeBar', [
+      transition(':enter', [
+        style({
+          opacity: 0,
+        }),
+        animate('.2s', style({
+          opacity: 1,
+        }))
+      ]),
+      transition(':leave', [
+        animate('.2s', style({
+          opacity: 0,
+        }))
+      ])
     ])
   ]
 })
@@ -48,22 +63,26 @@ export class PlayerComponent implements OnInit, OnChanges {
   private canPlay = false
   private audioEl: HTMLAudioElement
   showPanel = false
-  isDown = true
-  putAway = false //播放器是否收起(不是消失)
-  private hostEL:HTMLElement
+  isDown = false
+  putAway = false //播放器是否收起在侧边
+  private hostEL: HTMLElement
+  isProsody = false //是否禁音
+  isShow = false //是否显示音量控制面板
+  private currentVolume = 0
+  private prevVolume: number = 0
   @Input() trackList: Track[] = []
   @Input() currentIndex = 0
   @Input() currentTrack: Track
   @Input() album: AlbumInfo
   @Input() playing = false
-  @ViewChild('audio', {static: true}) readonly audioRef: ElementRef
   @ViewChild('player', {static: true}) readonly playerRef: ElementRef
+  @ViewChild('audio', {static: true}) readonly audioRef: ElementRef
   @Output() closed = new EventEmitter<void>()
 
   constructor(
     private playerServe: PlayerService,
-    @Inject(DOCUMENT) private doc:Document,
-    private rd2:Renderer2
+    @Inject(DOCUMENT) private doc: Document,
+    private rd2: Renderer2,
   ) {
   }
 
@@ -80,6 +99,37 @@ export class PlayerComponent implements OnInit, OnChanges {
         this.audioEl.pause()
       }
     }
+  }
+
+  isShowVolumeBar(): void {
+    this.isShow = !this.isShow
+    this.showPanel && !this.isDown ? this.showPanel = false : ''
+  }
+
+  changeVolume(event: MouseEvent): void {
+    event.preventDefault()
+    event.stopPropagation()
+    const target = event.target['nodeName']
+    if (target === 'I') {
+      if (this.isProsody) {
+        if (this.currentVolume !== 0) {
+          this.setVolume(this.currentVolume)
+        } else {
+          this.isProsody = false
+          this.prevVolume !== 0 ? this.setVolume(this.prevVolume) : this.setVolume(1)
+        }
+      } else {
+        this.isProsody = true
+        this.prevVolume = this.currentVolume
+        this.setVolume(0)
+      }
+    }
+  }
+
+  setVolume(volume: number): void {
+    this.audioEl.volume = volume
+    this.currentVolume = volume
+    this.currentVolume === 0 ? this.isProsody = true : this.isProsody = false
   }
 
   play() {
@@ -169,9 +219,11 @@ export class PlayerComponent implements OnInit, OnChanges {
   togglePanel(show: boolean) {
     if (show) {
       const {top} = this.playerRef.nativeElement.getBoundingClientRect()
-      this.isDown = top < PANEL_HEIGHT - 10
+      this.isDown = top < (PANEL_HEIGHT - 10)
     }
     this.showPanel = show
+    this.isShow && !this.isDown ? this.isShow = false : ''
+
   }
 
   private updateIndex(index: number, canPlay = false): void {
@@ -199,27 +251,27 @@ export class PlayerComponent implements OnInit, OnChanges {
 
   dragEnd(hostEl: HTMLElement): void {
     this.hostEL = hostEl
-    const {width, height, left ,top} = hostEl.getBoundingClientRect()
+    const {width, height, left, top} = hostEl.getBoundingClientRect()
     const clientWidth = this.doc.documentElement.clientWidth
     const maxTop = this.doc.documentElement.clientHeight - height
-    this.rd2.setStyle(hostEl,'transition','all .2s')
+    this.rd2.setStyle(hostEl, 'transition', 'all .2s')
     if (top < 0) {
-      this.rd2.setStyle(hostEl,'top',0)
+      this.rd2.setStyle(hostEl, 'top', 0)
     }
     if (top > maxTop) {
-      this.rd2.setStyle(hostEl,'top',maxTop + 'px')
+      this.rd2.setStyle(hostEl, 'top', maxTop + 'px')
     }
 
     if (clientWidth - left <= width / 2) {
-      this.rd2.setStyle(hostEl,'left',(clientWidth - THUMBNAIL_WIDTH) + 'px')
+      this.rd2.setStyle(hostEl, 'left', (clientWidth - THUMBNAIL_WIDTH) + 'px')
       this.putAway = true
     }
   }
 
-  hoverHost():void {
+  hoverHost(): void {
     if (this.putAway) {
       const maxLeft = this.doc.documentElement.clientWidth - this.hostEL.getBoundingClientRect().width
-      this.rd2.setStyle(this.hostEL,'left',maxLeft + 'px')
+      this.rd2.setStyle(this.hostEL, 'left', maxLeft + 'px')
       this.putAway = false
     }
   }

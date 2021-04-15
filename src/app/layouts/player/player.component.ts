@@ -13,6 +13,7 @@ import {AlbumInfo, Track} from "../../services/apis/types";
 import {PlayerService} from "../../services/business/player.service";
 import {animate, style, transition, trigger} from "@angular/animations";
 import {DOCUMENT} from "@angular/common";
+import set = Reflect.set;
 
 const PANEL_HEIGHT = 280 //播放器的列表最大高度
 const THUMBNAIL_WIDTH = 50 //播放器的专辑封面宽度
@@ -41,21 +42,6 @@ const THUMBNAIL_WIDTH = 50 //播放器的专辑封面宽度
           height: 0
         }))
       ])
-    ]),
-    trigger('isShowVolumeBar', [
-      transition(':enter', [
-        style({
-          opacity: 0,
-        }),
-        animate('.2s', style({
-          opacity: 1,
-        }))
-      ]),
-      transition(':leave', [
-        animate('.2s', style({
-          opacity: 0,
-        }))
-      ])
     ])
   ]
 })
@@ -68,8 +54,11 @@ export class PlayerComponent implements OnInit, OnChanges {
   private hostEL: HTMLElement
   isProsody = false //是否禁音
   isShow = false //是否显示音量控制面板
-  private currentVolume = 0
+  currentVolume = 0
   private prevVolume: number = 0
+  barHeight:number
+  bar:HTMLElement
+  circle:HTMLElement
   @Input() trackList: Track[] = []
   @Input() currentIndex = 0
   @Input() currentTrack: Track
@@ -101,7 +90,9 @@ export class PlayerComponent implements OnInit, OnChanges {
     }
   }
 
-  isShowVolumeBar(): void {
+  isShowVolumeBar(event:MouseEvent): void {
+    event.preventDefault()
+    event.stopPropagation()
     this.isShow = !this.isShow
     this.showPanel && !this.isDown ? this.showPanel = false : ''
   }
@@ -111,13 +102,10 @@ export class PlayerComponent implements OnInit, OnChanges {
     event.stopPropagation()
     const target = event.target['nodeName']
     if (target === 'I') {
+      //当前是否禁音
       if (this.isProsody) {
-        if (this.currentVolume !== 0) {
-          this.setVolume(this.currentVolume)
-        } else {
           this.isProsody = false
-          this.prevVolume !== 0 ? this.setVolume(this.prevVolume) : this.setVolume(1)
-        }
+          this.prevVolume !== 0 ? this.setVolume(this.prevVolume) : this.setVolume(0.1)
       } else {
         this.isProsody = true
         this.prevVolume = this.currentVolume
@@ -126,10 +114,17 @@ export class PlayerComponent implements OnInit, OnChanges {
     }
   }
 
+  getEl():void {
+    this.bar = this.doc.querySelector('.bar')
+    this.circle = this.doc.querySelector('.circle')
+    this.barHeight = this.bar?.getBoundingClientRect().height
+  }
+
   setVolume(volume: number): void {
     this.audioEl.volume = volume
     this.currentVolume = volume
     this.currentVolume === 0 ? this.isProsody = true : this.isProsody = false
+    setTimeout(this.getEl.bind(this),0)
   }
 
   play() {

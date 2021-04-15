@@ -16,12 +16,12 @@
         <i class="icon icon-next" xmIcon="next" (click)="next(currentIndex + 1)"></i>
       </div>
     </div>
-    <div class="volume">
-      <i class="icon" xmIcon="laba" (click)="isShowVolumeBar()">
-        <span class="volume-box" @isShowVolumeBar *ngIf="isShow && !putAway">
+    <div class="volume" (click)="isShowVolumeBar($event)">
+      <i class="icon" xmIcon="laba">
+        <span class="volume-box" *ngIf="isShow && !putAway">
           <span class="volume-controller">
             <span class="bar">
-              <span class="circle" xmVolume (volume)="setVolume($event)"></span>
+              <span class="circle" [getBarHeight]="barHeight" xmVolume (volume)="setVolume($event)"></span>
             </span>
           </span>
           <i class="is-prosody" (click)="changeVolume($event)" [xmIcon]="isProsody ? 'mute_icon' : 'laba'"></i>

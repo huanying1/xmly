@@ -3,24 +3,24 @@ import {
   Directive,
   ElementRef, EventEmitter,
   HostListener,
-  Inject,
+  Inject, Input, OnChanges,
   Output,
   PLATFORM_ID,
-  Renderer2
+  Renderer2, SimpleChanges
 } from '@angular/core';
 import {DOCUMENT, isPlatformBrowser} from "@angular/common";
 import {clamp} from 'lodash'
 
 interface StartPosition {
   y: number  //鼠标点击音量圆点时距离顶部的距离
-  bottom:number //音量条底部距离浏览器视口顶部的位置
+  bottom: number //音量条底部距离浏览器视口顶部的位置
 }
 
 @Directive({
   selector: '[xmVolume]'
 })
 
-export class VolumeDirective implements AfterViewInit {
+export class VolumeDirective implements AfterViewInit,OnChanges {
   private bar: HTMLElement
   private barHeight: number
   startPosition: StartPosition
@@ -30,7 +30,7 @@ export class VolumeDirective implements AfterViewInit {
   private dragEndHandler: () => void
   private dragMoveDocHandler: () => void
   @Output() volume = new EventEmitter<number>()
-
+  @Input() getBarHeight:number
   constructor(
     private rd2: Renderer2,
     private el: ElementRef,
@@ -42,13 +42,38 @@ export class VolumeDirective implements AfterViewInit {
   ngAfterViewInit() {
     this.circle = this.el.nativeElement
     this.bar = this.circle.parentElement
+    this.rd2.listen(this.bar,'click',this.clickSetVolume.bind(this))
     this.barHeight = this.bar.getBoundingClientRect().height
   }
 
-  setVolume(top:number) {
-    this.rd2.setStyle(this.bar,'height',top + 'px')
-    const volume = (this.barHeight * (top * 0.01) * 0.01)
-    this.volume.emit(volume)
+  ngOnChanges(changes: SimpleChanges): void {
+    const {getBarHeight} = changes
+    if (getBarHeight.currentValue) {
+      this.setVolume(getBarHeight.currentValue)
+    }
+  }
+
+  setVolume(top: number) {
+    setTimeout(() => {
+      this.rd2.setStyle(this.circle, 'bottom', top + 'px')
+      this.rd2.setStyle(this.bar, 'height', top + 'px')
+      const volume = (this.barHeight * (top * 0.01) * 0.01)
+      this.volume.emit(volume)
+    },0)
+  }
+
+  clickSetVolume(event: MouseEvent): void {
+    event.preventDefault()
+    event.stopPropagation()
+    const y = event.clientY
+    const {bottom} = this.bar.getBoundingClientRect()
+    this.startPosition = {
+      y,
+      bottom
+    }
+    const diffY = this.startPosition.bottom - event.clientY - 5
+    const {top} = this.calculate(diffY)
+    this.setVolume(top)
   }
 
   @HostListener('mousedown', ['$event'])
@@ -72,10 +97,9 @@ export class VolumeDirective implements AfterViewInit {
   moveVolume(event: MouseEvent): void {
     event.preventDefault()
     event.stopPropagation()
-    console.log('move')
     const diffY = this.startPosition.bottom - event.clientY - 5
     const {top} = this.calculate(diffY)
-    this.rd2.setStyle(this.circle,'bottom',top + 'px')
+    this.rd2.setStyle(this.circle, 'bottom', top + 'px')
     this.setVolume(top)
   }
 
@@ -89,7 +113,7 @@ export class VolumeDirective implements AfterViewInit {
       if (this.dragMoveHandler) {
         this.dragMoveHandler()
       }
-      if(this.dragMoveDocHandler) {
+      if (this.dragMoveDocHandler) {
         this.dragMoveDocHandler()
       }
       if (this.dragEndHandler) {
@@ -109,3 +133,4 @@ export class VolumeDirective implements AfterViewInit {
     }
   }
 }
+

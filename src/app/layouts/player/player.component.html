@@ -16,9 +16,9 @@
         <i class="icon icon-next" xmIcon="next" (click)="next(currentIndex + 1)"></i>
       </div>
     </div>
-    <div class="volume" (click)="isShowVolumeBar($event)">
-      <i class="icon" xmIcon="laba">
-        <span class="volume-box" *ngIf="isShow && !putAway">
+    <div class="volume">
+      <i class="icon" (click)="isShowVolumeBar($event)" xmIcon="laba">
+        <span class="volume-box" [hidden]="!isShow && !putAway">
           <span class="volume-controller">
             <span class="bar">
               <span class="circle" [getBarHeight]="barHeight" xmVolume (volume)="setVolume($event)"></span>

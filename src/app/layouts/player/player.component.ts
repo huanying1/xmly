@@ -56,9 +56,7 @@ export class PlayerComponent implements OnInit, OnChanges {
   isShow = false //是否显示音量控制面板
   currentVolume = 0
   private prevVolume: number = 0
-  barHeight:number
-  bar:HTMLElement
-  circle:HTMLElement
+  barHeight: number
   @Input() trackList: Track[] = []
   @Input() currentIndex = 0
   @Input() currentTrack: Track
@@ -90,11 +88,14 @@ export class PlayerComponent implements OnInit, OnChanges {
     }
   }
 
-  isShowVolumeBar(event:MouseEvent): void {
+  isShowVolumeBar(event: MouseEvent): void {
     event.preventDefault()
     event.stopPropagation()
-    this.isShow = !this.isShow
-    this.showPanel && !this.isDown ? this.showPanel = false : ''
+    const reg = /icon/g
+    if (reg.test(event.target['className'])) {
+      this.isShow = !this.isShow
+      this.showPanel && !this.isDown ? this.showPanel = false : ''
+    }
   }
 
   changeVolume(event: MouseEvent): void {
@@ -104,8 +105,8 @@ export class PlayerComponent implements OnInit, OnChanges {
     if (target === 'I') {
       //当前是否禁音
       if (this.isProsody) {
-          this.isProsody = false
-          this.prevVolume !== 0 ? this.setVolume(this.prevVolume) : this.setVolume(0.1)
+        this.isProsody = false
+        this.prevVolume !== 0 ? this.setVolume(this.prevVolume) : this.setVolume(0.1)
       } else {
         this.isProsody = true
         this.prevVolume = this.currentVolume
@@ -114,17 +115,10 @@ export class PlayerComponent implements OnInit, OnChanges {
     }
   }
 
-  getEl():void {
-    this.bar = this.doc.querySelector('.bar')
-    this.circle = this.doc.querySelector('.circle')
-    this.barHeight = this.bar?.getBoundingClientRect().height
-  }
-
   setVolume(volume: number): void {
     this.audioEl.volume = volume
     this.currentVolume = volume
     this.currentVolume === 0 ? this.isProsody = true : this.isProsody = false
-    setTimeout(this.getEl.bind(this),0)
   }
 
   play() {

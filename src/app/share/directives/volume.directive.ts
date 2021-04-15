@@ -20,9 +20,9 @@ interface StartPosition {
   selector: '[xmVolume]'
 })
 
-export class VolumeDirective implements AfterViewInit,OnChanges {
+export class VolumeDirective implements AfterViewInit {
   private bar: HTMLElement
-  private barHeight: number
+  private barHeight:number
   startPosition: StartPosition
   movable = false
   private circle: HTMLElement
@@ -30,7 +30,7 @@ export class VolumeDirective implements AfterViewInit,OnChanges {
   private dragEndHandler: () => void
   private dragMoveDocHandler: () => void
   @Output() volume = new EventEmitter<number>()
-  @Input() getBarHeight:number
+  @Input() getBarHeight: number
   constructor(
     private rd2: Renderer2,
     private el: ElementRef,
@@ -42,24 +42,14 @@ export class VolumeDirective implements AfterViewInit,OnChanges {
   ngAfterViewInit() {
     this.circle = this.el.nativeElement
     this.bar = this.circle.parentElement
-    this.rd2.listen(this.bar,'click',this.clickSetVolume.bind(this))
-    this.barHeight = this.bar.getBoundingClientRect().height
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    const {getBarHeight} = changes
-    if (getBarHeight.currentValue) {
-      this.setVolume(getBarHeight.currentValue)
-    }
+    this.rd2.listen(this.bar, 'click', this.clickSetVolume.bind(this))
   }
 
   setVolume(top: number) {
-    setTimeout(() => {
-      this.rd2.setStyle(this.circle, 'bottom', top + 'px')
-      this.rd2.setStyle(this.bar, 'height', top + 'px')
-      const volume = (this.barHeight * (top * 0.01) * 0.01)
-      this.volume.emit(volume)
-    },0)
+    this.rd2.setStyle(this.circle, 'bottom', top + 'px')
+    this.rd2.setStyle(this.bar, 'height', top + 'px')
+    const volume = (this.barHeight * (top * 0.01) * 0.01)
+    this.volume.emit(volume)
   }
 
   clickSetVolume(event: MouseEvent): void {
@@ -79,9 +69,9 @@ export class VolumeDirective implements AfterViewInit,OnChanges {
   @HostListener('mousedown', ['$event'])
   dragStart(event: MouseEvent) {
     if (isPlatformBrowser(this.platform)) {
-      const allowDrag = event.button === 0
       event.preventDefault()
       event.stopPropagation()
+      const allowDrag = event.button === 0
       if (allowDrag) {
         const y = event.clientY
         const {bottom} = this.bar.getBoundingClientRect()
@@ -99,7 +89,6 @@ export class VolumeDirective implements AfterViewInit,OnChanges {
     event.stopPropagation()
     const diffY = this.startPosition.bottom - event.clientY - 5
     const {top} = this.calculate(diffY)
-    this.rd2.setStyle(this.circle, 'bottom', top + 'px')
     this.setVolume(top)
   }
 
@@ -127,6 +116,9 @@ export class VolumeDirective implements AfterViewInit,OnChanges {
   }
 
   calculate(diffY: number): { top: number } {
+    if (!this.barHeight) {
+      this.barHeight = this.bar.getBoundingClientRect().height
+    }
     let newTop = clamp(diffY, 0, this.barHeight)
     return {
       top: newTop

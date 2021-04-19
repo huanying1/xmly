@@ -1,4 +1,4 @@
-import {Component, OnInit, ChangeDetectionStrategy, Input, TemplateRef, Optional} from '@angular/core';
+import {Component, OnInit, ChangeDetectionStrategy, Optional} from '@angular/core';
 import {BreadcrumbComponent} from "../breadcrumb.component";
 
 @Component({
@@ -8,7 +8,6 @@ import {BreadcrumbComponent} from "../breadcrumb.component";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BreadcrumbItemComponent implements OnInit {
-  myContext = {$implicit: 'World', my: 'steven'}
 
   constructor(@Optional() readonly parent: BreadcrumbComponent) {
   }

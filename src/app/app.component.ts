@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@an
 import {AlbumService} from "./services/apis/album.service";
 import {AlbumInfo, Category, Track} from "./services/apis/types";
 import {CategoryService} from "./services/business/category.service";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {combineLatest} from "rxjs";
 import {OverlayService} from "./services/tools/overlay.service";
 import {WindowService} from "./services/tools/window.service";
@@ -12,7 +12,7 @@ import {storageKeys} from "./config";
 import {MessageService} from "./share/components/message/message.service";
 import {PlayerService} from "./services/business/player.service";
 import {animate, style, transition, trigger} from "@angular/animations";
-
+import {compact} from 'lodash'
 @Component({
   selector: 'xm-root',
   templateUrl: './app.component.html',
@@ -50,6 +50,7 @@ export class AppComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private categoryServe: CategoryService,
     private router: Router,
+    private route: ActivatedRoute,
     private overlayServe: OverlayService,
     private windowServe: WindowService,
     private userServe: UserService,
@@ -85,9 +86,10 @@ export class AppComponent implements OnInit {
           this.setCurrentCategory()
         }
       }
-      this.subCategory = subCategory
+        this.subCategory = compact(subCategory)
     })
     this.getCategories()
+
   }
 
   private watchPlayer(): void {

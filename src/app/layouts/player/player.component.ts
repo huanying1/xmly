@@ -11,9 +11,8 @@ import {
 } from '@angular/core';
 import {AlbumInfo, Track} from "../../services/apis/types";
 import {PlayerService} from "../../services/business/player.service";
-import {animate, style, transition, trigger} from "@angular/animations";
+import {animate, state, style, transition, trigger} from "@angular/animations";
 import {DOCUMENT} from "@angular/common";
-import set = Reflect.set;
 
 const PANEL_HEIGHT = 280 //播放器的列表最大高度
 const THUMBNAIL_WIDTH = 50 //播放器的专辑封面宽度
@@ -42,9 +41,15 @@ const THUMBNAIL_WIDTH = 50 //播放器的专辑封面宽度
           height: 0
         }))
       ])
+    ]),
+    trigger('showVolume', [
+      state('true', style({ opacity:1 })),
+      state('false', style({ opacity:0,pointerEvents:'none' })),
+      transition('false <=> true', animate(200))
     ])
   ]
 })
+
 export class PlayerComponent implements OnInit, OnChanges {
   private canPlay = false
   private audioEl: HTMLAudioElement
@@ -54,6 +59,7 @@ export class PlayerComponent implements OnInit, OnChanges {
   private hostEL: HTMLElement
   isProsody = false //是否禁音
   isShow = false //是否显示音量控制面板
+  animate = false //显示隐藏动画的状态
   currentVolume = 0
   private prevVolume: number = 0
   barHeight: number
@@ -212,7 +218,6 @@ export class PlayerComponent implements OnInit, OnChanges {
     }
     this.showPanel = show
     this.isShow && !this.isDown ? this.isShow = false : ''
-
   }
 
   private updateIndex(index: number, canPlay = false): void {

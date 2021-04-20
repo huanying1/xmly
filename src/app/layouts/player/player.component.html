@@ -18,7 +18,7 @@
     </div>
     <div class="volume">
       <i class="icon" (click)="isShowVolumeBar($event)" xmIcon="laba">
-        <span class="volume-box" [hidden]="!isShow && !putAway">
+        <span class="volume-box" [@showVolume]="isShow">
           <span class="volume-controller">
             <span class="bar">
               <span class="circle" [getBarHeight]="barHeight" xmVolume (volume)="setVolume($event)"></span>

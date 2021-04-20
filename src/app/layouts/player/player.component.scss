@@ -59,7 +59,6 @@
           height: 124px;
           border-top-left-radius: 20px;
           border-top-right-radius: 20px;
-          animation: hidden .3s;
 
           .volume-controller {
             position: absolute;
@@ -168,13 +167,11 @@
       }
     }
   }
+  .recover {
+    animation: recover 1s;
+  }
+  .hidden {
+    animation: hidden 1s;
+  }
 }
 
-@keyframes hidden {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}

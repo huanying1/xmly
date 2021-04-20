@@ -55,11 +55,11 @@ export class PlayerComponent implements OnInit, OnChanges {
   private audioEl: HTMLAudioElement
   showPanel = false
   isDown = false
+  disabled = false
   putAway = false //播放器是否收起在侧边
   private hostEL: HTMLElement
   isProsody = false //是否禁音
   isShow = false //是否显示音量控制面板
-  animate = false //显示隐藏动画的状态
   currentVolume = 0
   private prevVolume: number = 0
   barHeight: number
@@ -259,6 +259,7 @@ export class PlayerComponent implements OnInit, OnChanges {
     if (clientWidth - left <= width / 2) {
       this.rd2.setStyle(hostEl, 'left', (clientWidth - THUMBNAIL_WIDTH) + 'px')
       this.putAway = true
+      this.isShow = false
     }
   }
 
@@ -268,5 +269,11 @@ export class PlayerComponent implements OnInit, OnChanges {
       this.rd2.setStyle(this.hostEL, 'left', maxLeft + 'px')
       this.putAway = false
     }
+  }
+
+  closedPlayer() {
+    const volumeBox = this.doc.querySelector('.volume-box')
+    this.rd2.setStyle(volumeBox,'display','none')
+    this.closed.emit()
   }
 }

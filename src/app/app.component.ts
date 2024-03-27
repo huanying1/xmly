@@ -50,8 +50,6 @@ export class AppComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private categoryServe: CategoryService,
     private router: Router,
-    private route: ActivatedRoute,
-    private overlayServe: OverlayService,
     private windowServe: WindowService,
     private userServe: UserService,
     private contextServe: ContextService,
